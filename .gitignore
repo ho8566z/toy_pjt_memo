@@ -1,1 +1,7 @@
+*.class
+
+bin/
+
 build/
+
+.settings/
