@@ -1,7 +1,1 @@
-*.class
-
 build/
-
-bin/
-
-.settings/
