@@ -1,7 +1,6 @@
 package com.office.toypjt.member;
 
 public class MemberDto {
-
 	private int memNo;
 	private String memId;
 	private String memPw;
