@@ -1,5 +1,5 @@
 package com.office.toypjt.member;
 
-public class MemberDao {
-
+public class MemberDao implements IMemberDao {
+	
 }
