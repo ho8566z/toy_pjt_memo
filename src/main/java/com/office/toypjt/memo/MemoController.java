@@ -19,7 +19,29 @@ public class MemoController extends HttpServlet {
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
-		response.getWriter().append("Served at: ").append(request.getContextPath());
+		StringBuffer stringBuffer = request.getRequestURL();
+		System.out.println("stringBuffer: " + stringBuffer.toString());
+		
+		String requestURI = request.getRequestURI();
+		System.out.println("requestURI: " + requestURI);
+		
+		String contextPath = request.getContextPath();
+		System.out.println("contextpath: " + contextPath);
+		
+		String command = requestURI.substring(contextPath.length());
+		System.out.println("command: " + command);
+		
+		String nextPage = null;
+		
+		
+		switch (command) {
+		case:
+			
+			break;
+
+		default:
+			break;
+		}
 	}
 
 	
