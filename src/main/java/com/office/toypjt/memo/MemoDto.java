@@ -1,7 +1,6 @@
 package com.office.toypjt.memo;
 
 public class MemoDto {
-
 	private int memoNo;
 	private String memId;
 	private String memoTitle;
@@ -10,6 +9,11 @@ public class MemoDto {
 	private String memoModDate;
 
 	public MemoDto() {
+	}
+
+	public MemoDto(String memoTitle, String memoComent) {
+		this.memoTitle = memoTitle;
+		this.memoComent = memoComent;
 	}
 
 	public MemoDto(int memoNo, String memId, String memoTitle, String memoComent) {
@@ -76,5 +80,4 @@ public class MemoDto {
 	public void setMemoModDate(String memoModDate) {
 		this.memoModDate = memoModDate;
 	}
-
 }
