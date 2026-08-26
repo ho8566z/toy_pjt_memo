@@ -23,7 +23,6 @@ public class MemberController extends HttpServlet {
         super();
        
     }
-
 	
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 	
@@ -41,6 +40,8 @@ public class MemberController extends HttpServlet {
 		
 		String nextPage = null;
 		MemberService memberService = null;
+		
+//		request.getSession().setAttribute(MemberConfig.SINGINED_MEMBERID, "gildong");
 		
 		switch (command) {
 			
