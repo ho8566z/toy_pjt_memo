@@ -41,15 +41,15 @@ public class MemberController extends HttpServlet {
 		String nextPage = null;
 		MemberService memberService = null;
 		
-		
 		switch (command) {
-			
 			case MemberConfig.MEMBER_SIGNUP_FORM:
-				// sign_up_form
+				nextPage = "views/member_signup_form.jsp";
 				break;
 			
 			case MemberConfig.MEMBER_SIGNUP_CONFIRM:
-				// sign_up_confirm
+				memberService = new MemberService();
+				memberService.addMember(request, response);
+				nextPage = "views/member_signup_form.jsp";
 				break;
 			
 			case MemberConfig.MEMBER_SIGNIN_FORM:
