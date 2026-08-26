@@ -8,4 +8,6 @@ public interface IMemberDao {
 
 	public int updateMemberByMemNo(MemberDto memberDto);
 
+	public int deleteMemberByMemId(String memId);
+
 }
