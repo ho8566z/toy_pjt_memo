@@ -41,7 +41,7 @@ public class MemberController extends HttpServlet {
 		String nextPage = null;
 		MemberService memberService = null;
 		
-//		request.getSession().setAttribute(MemberConfig.SINGINED_MEMBERID, "gildong");
+		request.getSession().setAttribute(MemberConfig.SINGINED_MEMBERID, "gildong");
 		
 		switch (command) {
 			case MemberConfig.MEMBER_SIGNUP_FORM:
@@ -49,7 +49,7 @@ public class MemberController extends HttpServlet {
 				break;
 			
 			case MemberConfig.MEMBER_SIGNUP_CONFIRM:
-				memberService = new MemberService();
+				memberService = new MemberService(new MemberDao());
 				memberService.addMember(request, response);
 				nextPage = "views/member_signup_form.jsp";
 				break;

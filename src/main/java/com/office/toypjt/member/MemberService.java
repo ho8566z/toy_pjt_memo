@@ -78,9 +78,6 @@ public class MemberService {
 			System.out.println(CLASS_NAME.concat("MEMBER DELETE FAIL"));
 		
 		}
-		
-		return result;
-	}
 
 		return result;
 	}
