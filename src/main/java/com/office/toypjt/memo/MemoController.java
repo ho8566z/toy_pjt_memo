@@ -12,6 +12,7 @@ import jakarta.servlet.http.HttpSession;
 @WebServlet("*.memo")
 public class MemoController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+	private final String CLASS_NAME = "[MemoController] ";
 	private final MemoService memoService = new MemoService();
        
     public MemoController() {
@@ -19,87 +20,95 @@ public class MemoController extends HttpServlet {
 
     }
 
-    // 역할 : 메모 수정 및 삭제 요청 처리
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		String command = request.getServletPath();
-		try {
-			switch (command) {
-			case MemoConfig.MODIFY_FORM_URL:
-				Integer memNo = requireLogin(request, response);
-				if (memNo == null) return;
+		String requestURI = request.getRequestURI();
+		String contextPath = request.getContextPath();
+		String command = requestURI.substring(contextPath.length());
 
-				MemoDto memoDto = memoService.getMemoForModify(request, memNo);
-				if (memoDto == null) {
-					response.sendError(HttpServletResponse.SC_NOT_FOUND, "수정할 메모가 없습니다.");
-					return;
-				}
-
-				request.setAttribute("memoDto", memoDto);
-				request.getRequestDispatcher("/WEB-INF/views/memo/memo_modify_form.jsp")
-						.forward(request, response);
-				break;
-			default:
-				response.sendError(HttpServletResponse.SC_NOT_FOUND);
-			}
-		} catch (IllegalArgumentException e) {
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+		if (!MemoConfig.MEMO_MODIFY_FORM.equals(command)) {
+			redirectMemoList(request, response);
+			return;
 		}
+
+		System.out.println(CLASS_NAME.concat(MemoConfig.MEMO_MODIFY_FORM));
+
+		String memId = getSigninedMemId(request);
+		if (memId == null) {
+			redirectSignin(request, response);
+			return;
+		}
+
+		MemoDto memoDto = memoService.getMemoForModify(request, memId);
+		if (memoDto == null) {
+			redirectMemoList(request, response);
+			return;
+		}
+
+		request.setAttribute("memoDto", memoDto);
+		request.getRequestDispatcher(generateViewName("/memo_modify_form"))
+				.forward(request, response);
 	}
 
-	// 역할 : 메모 수정 및 삭제 요청 처리
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		request.setCharacterEncoding("UTF-8");
-		String command = request.getServletPath();
-		try {
-			Integer memNo = requireLogin(request, response);
-			if (memNo == null) return;
 
-			switch (command) {
-			case MemoConfig.MODIFY_CONFIRM_URL:
-				int modifyResult = memoService.modifyMemo(request, memNo);
-				if (modifyResult != 1) {
-					response.sendError(HttpServletResponse.SC_NOT_FOUND,
-							"수정할 메모가 없거나 수정 권한이 없습니다.");
-					return;
-				}
-				redirectHome(request, response);
-				break;
-			case MemoConfig.DELETE_CONFIRM_URL:
-				int deleteResult = memoService.deleteMemo(request, memNo);
-				if (deleteResult != 1) {
-					response.sendError(HttpServletResponse.SC_NOT_FOUND,
-							"삭제할 메모가 없거나 삭제 권한이 없습니다.");
-					return;
-				}
-				redirectHome(request, response);
-				break;
-			default:
-				response.sendError(HttpServletResponse.SC_NOT_FOUND);
-			}
-		} catch (IllegalArgumentException e) {
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+		String requestURI = request.getRequestURI();
+		String contextPath = request.getContextPath();
+		String command = requestURI.substring(contextPath.length());
+
+		String memId = getSigninedMemId(request);
+		if (memId == null) {
+			redirectSignin(request, response);
+			return;
 		}
+
+		int result = MemoService.INVALID_INPUT;
+
+		switch (command) {
+		case MemoConfig.MEMO_MODIFY_CONFIRM:
+			System.out.println(CLASS_NAME.concat(MemoConfig.MEMO_MODIFY_CONFIRM));
+			result = memoService.modifyMemo(request, memId);
+			break;
+
+		case MemoConfig.MEMO_DELETE:
+			System.out.println(CLASS_NAME.concat(MemoConfig.MEMO_DELETE));
+			result = memoService.deleteMemo(request, memId);
+			break;
+
+		default:
+			redirectMemoList(request, response);
+			return;
+		}
+
+		if (result > 0) {
+			System.out.println(CLASS_NAME.concat("MEMO PROCESS SUCCESS!!"));
+		} else {
+			System.out.println(CLASS_NAME.concat("MEMO PROCESS FAIL!!"));
+		}
+
+		redirectMemoList(request, response);
 	}
 
-	private Integer requireLogin(HttpServletRequest request, HttpServletResponse response) throws IOException {
-		Integer memNo = getLoginMemNo(request);
-		if (memNo == null) {
-			response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "먼저 로그인해 주세요.");
-		}
-		return memNo;
-	}
-
-	// 역할 : 세션에서 로그인한 회원 번호(memNo)를 가져옴
-	private Integer getLoginMemNo(HttpServletRequest request) {
+	private String getSigninedMemId(HttpServletRequest request) {
 		HttpSession session = request.getSession(false);
 		if (session == null) return null;
 
-		Object loginMemNo = session.getAttribute(MemoConfig.LOGIN_MEM_NO);
-		return loginMemNo instanceof Integer ? (Integer) loginMemNo : null;
+		Object signinedMemId = session.getAttribute(MemoConfig.SIGNINED_MEMBER_ID);
+		return signinedMemId == null ? null : String.valueOf(signinedMemId);
 	}
 
-	private void redirectHome(HttpServletRequest request, HttpServletResponse response) throws IOException {
-		response.sendRedirect(request.getContextPath() + MemoConfig.HOME_URL);
+	private void redirectMemoList(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		response.sendRedirect(request.getContextPath() + MemoConfig.MEMO_LIST_FORM);
+	}
+
+	private void redirectSignin(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		response.sendRedirect(request.getContextPath() + "/member_signin_form.mem");
+	}
+
+	private String generateViewName(String viewName) {
+		return MemoConfig.DEFAULT_VIEW_PATH
+				.concat(viewName)
+				.concat(MemoConfig.DEFAULT_VIEW_SUFFIX);
 	}
 
 }

@@ -5,43 +5,38 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
+import com.office.toypjt.ToyPjtConfig;
+
 public class MemoDao {
 
-	private final String DRIVER = "com.mysql.cj.jdbc.Driver";
-	private final String URL = "jdbc:mysql://localhost:3306/DB_MEMO";
-	private final String USER = "root";
-	private final String PASSWORD = "1234";
-
-	public MemoDto selectMemoByMemoNo(int memoNo, int memNo) {
+	public MemoDto selectMemoByMemoNo(int memoNo, String memId) {
 		System.out.println("[MemoDao] selectMemoByMemoNo()");
 
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
-		MemoDto memoDto = null;
 
 		try {
-			Class.forName(DRIVER);
-			conn = DriverManager.getConnection(URL, USER, PASSWORD);
+			Class.forName(ToyPjtConfig.DRIVER);
+			conn = DriverManager.getConnection(
+					ToyPjtConfig.URL, ToyPjtConfig.USER, ToyPjtConfig.PASSWORD);
 
-			String sql = "SELECT memo.*, member.memNo "
-					+ "FROM TBL_MEMO memo "
-					+ "JOIN TBL_MEMBER member ON memo.memId = member.memId "
-					+ "WHERE memo.memoNo = ? AND member.memNo = ?";
+			String sql = "SELECT * FROM TBL_MEMO "
+					+ "WHERE memoNo = ? AND memId = ?";
 
 			pstmt = conn.prepareStatement(sql);
 			pstmt.setInt(1, memoNo);
-			pstmt.setInt(2, memNo);
+			pstmt.setString(2, memId);
 			rs = pstmt.executeQuery();
 
 			if (rs.next()) {
-				memoDto = new MemoDto();
-				memoDto.setMemoNo(rs.getInt("memoNo"));
-				memoDto.setMemNo(rs.getInt("memNo"));
-				memoDto.setMemoTitle(rs.getString("memoTitle"));
-				memoDto.setMemoContent(rs.getString("memoComent"));
-				memoDto.setMemoRegDate(rs.getString("memoRegDate"));
-				memoDto.setMemoModDate(rs.getString("memoModDate"));
+				return new MemoDto(
+						rs.getInt("memoNo"),
+						rs.getString("memId"),
+						rs.getString("memoTitle"),
+						rs.getString("memoComent"),
+						rs.getString("memoRegDate"),
+						rs.getString("memoModDate"));
 			}
 
 		} catch (Exception e) {
@@ -55,10 +50,12 @@ public class MemoDao {
 
 			} catch (Exception e) {
 				e.printStackTrace();
+
 			}
+
 		}
 
-		return memoDto;
+		return null;
 	}
 
 	public int updateMemo(MemoDto memoDto) {
@@ -69,20 +66,19 @@ public class MemoDao {
 		int result = -1;
 
 		try {
-			Class.forName(DRIVER);
-			conn = DriverManager.getConnection(URL, USER, PASSWORD);
+			Class.forName(ToyPjtConfig.DRIVER);
+			conn = DriverManager.getConnection(
+					ToyPjtConfig.URL, ToyPjtConfig.USER, ToyPjtConfig.PASSWORD);
 
-			String sql = "UPDATE TBL_MEMO memo "
-					+ "JOIN TBL_MEMBER member ON memo.memId = member.memId "
-					+ "SET memo.memoTitle = ?, memo.memoComent = ?, "
-					+ "memo.memoModDate = CURRENT_TIMESTAMP "
-					+ "WHERE memo.memoNo = ? AND member.memNo = ?";
+			String sql = "UPDATE TBL_MEMO "
+					+ "SET memoTitle = ?, memoComent = ?, memoModDate = CURRENT_TIMESTAMP "
+					+ "WHERE memoNo = ? AND memId = ?";
 
 			pstmt = conn.prepareStatement(sql);
 			pstmt.setString(1, memoDto.getMemoTitle());
-			pstmt.setString(2, memoDto.getMemoContent());
+			pstmt.setString(2, memoDto.getMemoComent());
 			pstmt.setInt(3, memoDto.getMemoNo());
-			pstmt.setInt(4, memoDto.getMemNo());
+			pstmt.setString(4, memoDto.getMemId());
 			result = pstmt.executeUpdate();
 
 		} catch (Exception e) {
@@ -101,7 +97,7 @@ public class MemoDao {
 		return result;
 	}
 
-	public int deleteMemoByMemoNo(int memoNo, int memNo) {
+	public int deleteMemoByMemoNo(int memoNo, String memId) {
 		System.out.println("[MemoDao] deleteMemoByMemoNo()");
 
 		Connection conn = null;
@@ -109,16 +105,16 @@ public class MemoDao {
 		int result = -1;
 
 		try {
-			Class.forName(DRIVER);
-			conn = DriverManager.getConnection(URL, USER, PASSWORD);
+			Class.forName(ToyPjtConfig.DRIVER);
+			conn = DriverManager.getConnection(
+					ToyPjtConfig.URL, ToyPjtConfig.USER, ToyPjtConfig.PASSWORD);
 
-			String sql = "DELETE memo FROM TBL_MEMO memo "
-					+ "JOIN TBL_MEMBER member ON memo.memId = member.memId "
-					+ "WHERE memo.memoNo = ? AND member.memNo = ?";
+			String sql = "DELETE FROM TBL_MEMO "
+					+ "WHERE memoNo = ? AND memId = ?";
 
 			pstmt = conn.prepareStatement(sql);
 			pstmt.setInt(1, memoNo);
-			pstmt.setInt(2, memNo);
+			pstmt.setString(2, memId);
 			result = pstmt.executeUpdate();
 
 		} catch (Exception e) {
@@ -131,10 +127,13 @@ public class MemoDao {
 
 			} catch (Exception e) {
 				e.printStackTrace();
+
 			}
+
 		}
 
 		return result;
+
 	}
 
 }

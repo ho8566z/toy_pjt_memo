@@ -3,20 +3,30 @@ package com.office.toypjt.memo;
 public class MemoDto {
 
 	private int memoNo;
-	private int memNo;
+	private String memId;
 	private String memoTitle;
-	private String memoContent;
+	private String memoComent;
 	private String memoRegDate;
 	private String memoModDate;
 
 	public MemoDto() {
 	}
 
-	public MemoDto(int memoNo, int memNo, String memoTitle, String memoContent) {
+	public MemoDto(int memoNo, String memId, String memoTitle, String memoComent) {
 		this.memoNo = memoNo;
-		this.memNo = memNo;
+		this.memId = memId;
 		this.memoTitle = memoTitle;
-		this.memoContent = memoContent;
+		this.memoComent = memoComent;
+	}
+
+	public MemoDto(int memoNo, String memId, String memoTitle, String memoComent,
+			String memoRegDate, String memoModDate) {
+		this.memoNo = memoNo;
+		this.memId = memId;
+		this.memoTitle = memoTitle;
+		this.memoComent = memoComent;
+		this.memoRegDate = memoRegDate;
+		this.memoModDate = memoModDate;
 	}
 
 	public int getMemoNo() {
@@ -27,12 +37,12 @@ public class MemoDto {
 		this.memoNo = memoNo;
 	}
 
-	public int getMemNo() {
-		return memNo;
+	public String getMemId() {
+		return memId;
 	}
 
-	public void setMemNo(int memNo) {
-		this.memNo = memNo;
+	public void setMemId(String memId) {
+		this.memId = memId;
 	}
 
 	public String getMemoTitle() {
@@ -43,12 +53,12 @@ public class MemoDto {
 		this.memoTitle = memoTitle;
 	}
 
-	public String getMemoContent() {
-		return memoContent;
+	public String getMemoComent() {
+		return memoComent;
 	}
 
-	public void setMemoContent(String memoContent) {
-		this.memoContent = memoContent;
+	public void setMemoComent(String memoComent) {
+		this.memoComent = memoComent;
 	}
 
 	public String getMemoRegDate() {

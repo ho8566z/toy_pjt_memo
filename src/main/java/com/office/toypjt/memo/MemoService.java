@@ -3,47 +3,57 @@ package com.office.toypjt.memo;
 import jakarta.servlet.http.HttpServletRequest;
 
 public class MemoService {
+	public static final int INVALID_INPUT = -1;
 
+	private final String CLASS_NAME = "[MemoService] ";
 	private final MemoDao memoDao = new MemoDao();
 
-	// 역할 : 메모 수정 폼 요청 처리
-	public MemoDto getMemoForModify(HttpServletRequest request, int memNo) {
+	public MemoDto getMemoForModify(HttpServletRequest request, String memId) {
+		System.out.println(CLASS_NAME.concat("getMemoForModify()"));
+
 		int memoNo = getMemoNo(request);
-		return memoDao.selectMemoByMemoNo(memoNo, memNo);
+		if (memoNo < 1) return null;
+
+		return memoDao.selectMemoByMemoNo(memoNo, memId);
 	}
 
-	// 역할 : 메모 수정 요청 처리
-	public int modifyMemo(HttpServletRequest request, int memNo) {
+	public int modifyMemo(HttpServletRequest request, String memId) {
+		System.out.println(CLASS_NAME.concat("modifyMemo()"));
+
 		int memoNo = getMemoNo(request);
 		String memoTitle = trim(request.getParameter("memoTitle"));
-		String memoContent = trim(request.getParameter("memoContent"));
+		String memoComent = trim(request.getParameter("memoComent"));
 
-		if (memoTitle.isEmpty() || memoContent.isEmpty()) {
-			throw new IllegalArgumentException("제목과 내용을 모두 입력해 주세요.");
+		if (memoNo < 1 || memoTitle.isEmpty() || memoComent.isEmpty()) {
+			return INVALID_INPUT;
 		}
 
-		MemoDto memoDto = new MemoDto(memoNo, memNo, memoTitle, memoContent);
-		return memoDao.updateMemo(memoDto);
+		MemoDto memoDto = new MemoDto(memoNo, memId, memoTitle, memoComent);
+		int result = memoDao.updateMemo(memoDto);
+
+		return result;
 	}
 
-	// 역할 : 메모 삭제 요청 처리
-	public int deleteMemo(HttpServletRequest request, int memNo) {
+	public int deleteMemo(HttpServletRequest request, String memId) {
+		System.out.println(CLASS_NAME.concat("deleteMemo()"));
+
 		int memoNo = getMemoNo(request);
-		return memoDao.deleteMemoByMemoNo(memoNo, memNo);
+		if (memoNo < 1) return INVALID_INPUT;
+
+		return memoDao.deleteMemoByMemoNo(memoNo, memId);
 	}
 
-	// 역할 : 메모 번호를 요청에서 가져오는 메서드
 	private int getMemoNo(HttpServletRequest request) {
-		try {
-			int memoNo = Integer.parseInt(request.getParameter("memoNo"));
-			if (memoNo < 1) throw new NumberFormatException();
-			return memoNo;
+		String memoNo = trim(request.getParameter("memoNo"));
 
-		} catch (NumberFormatException e) {
-			throw new IllegalArgumentException("올바른 메모 번호를 입력해 주세요.");
+		if (memoNo.isEmpty() || memoNo.length() > 9 || !memoNo.matches("[0-9]+")) {
+			return INVALID_INPUT;
 		}
+
+		int parsedMemoNo = Integer.parseInt(memoNo);
+		return parsedMemoNo > 0 ? parsedMemoNo : INVALID_INPUT;
 	}
-	// 역할 : trim을 이용해서 문자열의 앞뒤 공백을 제거하고, null인 경우 빈 문자열로 반환함.
+
 	private String trim(String value) {
 		return value == null ? "" : value.trim();
 	}
