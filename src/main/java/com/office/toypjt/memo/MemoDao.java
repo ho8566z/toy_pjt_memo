@@ -35,8 +35,8 @@ public class MemoDao {
 			pstmt = conn.prepareStatement(sql);
 			
 			pstmt.setString(1, memoDto.getMemId());
-			pstmt.setString(1, memoDto.getMemoTitle());
-			pstmt.setString(1, memoDto.getMemoComent());
+			pstmt.setString(2, memoDto.getMemoTitle());
+			pstmt.setString(3, memoDto.getMemoComent());
 			
 			result = pstmt.executeUpdate();
 			
