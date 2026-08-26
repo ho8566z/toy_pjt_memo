@@ -5,15 +5,27 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 public class MemberService {
-	
+
 	final private String CLASS_NAME = "[MemberService] ";
-	
 	private IMemberDao memberDao;
 	
 	public MemberService(IMemberDao memberDao) {
 		this.memberDao = memberDao;
 	}
-	
+
+	public int addMember(HttpServletRequest request, HttpServletResponse response) {
+		System.out.println(CLASS_NAME.concat(" addMember()"));
+
+		String memId = request.getParameter("userId");
+		String memPw = request.getParameter("password");
+		String memMail = request.getParameter("email");
+		String memPhone = request.getParameter("phone");
+
+		MemberDto dto = new MemberDto(memId, memPw, memMail, memPhone);
+
+		int result = memberDao.insertNewMember(dto);
+    return result;
+  }
 	
 	public MemberDto getCurrentSigninedMember(String signinedMemId) {
 		System.out.println(CLASS_NAME.concat("getCurrentSigninedMember()"));
@@ -70,4 +82,6 @@ public class MemberService {
 		return result;
 	}
 
+		return result;
+	}
 }
